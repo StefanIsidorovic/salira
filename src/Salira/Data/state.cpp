@@ -1023,7 +1023,6 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
             }
 
             state._stack.pop();
-            state._stack.pop();
 
             GraphNodeType nodeType = state._graph[state.stack().last()].type();
 

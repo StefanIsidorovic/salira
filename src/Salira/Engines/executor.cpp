@@ -67,15 +67,18 @@ bool Executor::Init(QList<GCommand> commands, QString& errorMessage)
     {
         GCommand command = commands[i];
         state = nextState;
+
+        if(command.value() == "END")
+        {
+           state = State(state,command, state.maxID());
+           this->_states.push_back(state);
+           break;
+        }
+
         if(!(this->_states.last().GetNext(command, nextState, commands, i)))
         {
             errorMessage = nextState.errorMessage();;
             return false;
-        }
-
-        if(nextState.command().value() == "END")
-        {
-            break;
         }
 
         if(nextState.command().value() == "JUMP")
