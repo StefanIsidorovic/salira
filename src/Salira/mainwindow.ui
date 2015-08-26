@@ -112,9 +112,9 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="btnExecute">
+              <widget class="QPushButton" name="btnClear">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="minimumSize">
                 <size>
@@ -133,7 +133,42 @@
                </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
-                 <normaloff>:/images/Images/execute.png</normaloff>:/images/Images/execute.png</iconset>
+                 <normaloff>:/images/Images/brush.png</normaloff>:/images/Images/brush.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnTranslate">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/images/Images/book-go.png</normaloff>:/images/Images/book-go.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -263,7 +298,7 @@
              <item>
               <widget class="QPushButton" name="btnPrevious">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="minimumSize">
                 <size>
@@ -298,7 +333,7 @@
              <item>
               <widget class="QPushButton" name="btnNext">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="minimumSize">
                 <size>
@@ -333,7 +368,7 @@
              <item>
               <widget class="QPushButton" name="btnRun">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="minimumSize">
                 <size>
@@ -407,6 +442,9 @@
              <property name="enabled">
               <bool>true</bool>
              </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -472,7 +510,7 @@
             </size>
            </property>
            <property name="text">
-            <string>TextLabel</string>
+            <string>VAX Code</string>
            </property>
           </widget>
          </item>
@@ -780,6 +818,7 @@
     </property>
     <addaction name="tsmiOpen"/>
     <addaction name="separator"/>
+    <addaction name="tsmiTranslate"/>
     <addaction name="tsmiClear"/>
     <addaction name="tsmiSaveGCode"/>
     <addaction name="tsmiSaveVAXCode"/>
@@ -931,6 +970,18 @@
    </property>
    <property name="text">
     <string>&amp;Clear G Code</string>
+   </property>
+  </action>
+  <action name="tsmiTranslate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/Images/book-go.png</normaloff>:/images/Images/book-go.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Translate to G Code</string>
    </property>
   </action>
  </widget>

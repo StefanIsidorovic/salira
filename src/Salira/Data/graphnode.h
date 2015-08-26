@@ -34,6 +34,8 @@ public:
     GraphNodeType type();
     QString functionName();
     int value();
+
+    QString ToString();
 };
 
 #endif // GRAPHNODE_H

@@ -10,7 +10,7 @@
 #include <QTime>
 #include <iostream>
 
-static QString fileName = "/home/kostic/Downloads/Salira_Literatura/smiskovic_gmasina/";
+static QString fileName = "parser/ulaz.txt";
 static QList<GCommand> gCommands;
 static QList<VAXCommand> vaxCommands;
 static bool _stopped;
@@ -46,7 +46,6 @@ void MainWindow::FillGCodeEditor()
     }
     ui->txtEditorGCode->setHtml(buffer);
 
-    ui->tsmiClear->setEnabled(true);
     ui->tsmiSaveGCode->setEnabled(true);
     _gCodeValid = true;
 }
@@ -91,34 +90,7 @@ void MainWindow::FillGraph(bool clearOnly)
         return;
 
     for(int i = Executor::Instance().currentState().graph().length()-1; i >= 0 ; i--)
-    {
-        QString nodeName;
-        switch(Executor::Instance().currentState().graph()[i].type())
-        {
-        case 0:
-            nodeName = "HOLE";
-            break;
-        case 1:
-            nodeName = "INTEGER\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].id()+1)
-                    + "]\nValue = " + QString::number(Executor::Instance().currentState().graph()[i].value());
-            break;
-        case 2:
-            nodeName = "FUNCTION\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].id()+1)
-                    + "]\n" + Executor::Instance().currentState().graph()[i].functionName();
-            break;
-        case 3:
-            nodeName = "CONST\nNODE[" + QString::number(Executor::Instance().currentState().graph()[i].id()+1)
-                    + "]\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].idRef1()+1)
-                    + "]\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].idRef2()+1);
-            break;
-        case 4:
-            nodeName = "APPLICATION\nNODE[" + QString::number(Executor::Instance().currentState().graph()[i].id()+1)
-                    + "]\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].idRef1()+1)
-                    + "]\nNODE [" + QString::number(Executor::Instance().currentState().graph()[i].idRef2()+1) + "]";
-            break;
-        }
-        ui->frameGraph->layout()->addWidget(new QPushButton(nodeName));
-    }
+        ui->frameGraph->layout()->addWidget(new QPushButton(Executor::Instance().currentState().graph()[i].ToString()));
 }
 
 void MainWindow::FillDump(bool clearOnly)
@@ -128,9 +100,8 @@ void MainWindow::FillDump(bool clearOnly)
     if(clearOnly)
         return;
 
-
-
-    if(Executor::Instance().currentState().dump().length() > 0){
+    if(Executor::Instance().currentState().dump().length() > 0)
+    {
         // Avoiding sigsev.
         // Check if stack of dump element is empty, if it is, ignoring dump stack
         // NOTE: Pogledaj ovo.
@@ -155,30 +126,6 @@ void MainWindow::FillOutput(bool clearOnly)
 
     foreach (QString line, Executor::Instance().currentState().output())
         ui->txtOutput->append(">> " + line + "\n");
-
-    /*ui->txtOutput->append(QString("Stack:"));
-    for(int i =0; i < Executor::Instance().currentState().stack().length(); i++)
-        ui->txtOutput->append("id = " + QString::number(Executor::Instance().currentState().stack().at(i)));
-    ui->txtOutput->append(QString("Graph:"));
-    for(int i =0; i < Executor::Instance().currentState().graph().length(); i++)
-        ui->txtOutput->append("id = " + QString::number(Executor::Instance().currentState().graph()[i].id()) +
-                             + "value = " + QString::number(Executor::Instance().currentState().graph()[i].value()) +
-                              +" length=" + QString::number(Executor::Instance().currentState().graph().length())
-                              + " ep= " + QString::number(Executor::Instance().currentState().ep())
-                              + " type= " + QString::number(Executor::Instance().currentState().graph()[i].type())
-                              + " n1 n2 = " + QString::number(Executor::Instance().currentState().graph()[i].idRef1())
-                              + " " + QString::number(Executor::Instance().currentState().graph()[i].idRef2()));
-
-    ui->txtOutput->append(QString("Dump:"));
-    if(Executor::Instance().currentState().dump().length() > 0)
-    {
-        for(int j = 0; j < Executor::Instance().currentState().dump().last().stack().length(); j++)
-            ui->txtOutput->append(QString::number(Executor::Instance().currentState().dump().last().stack()[j]) + " ");
-    }
-    ui->txtOutput->append(QString("Dump Code:"));
-    if(Executor::Instance().currentState().dump().length() > 0)
-    for(int i = 0; i < Executor::Instance().currentState().dump().last().code().length(); i++)
-        ui->txtOutput->append(Executor::Instance().currentState().dump().last().code()[i]);*/
 }
 
 void MainWindow::RefreshUI(bool clearOnly, bool keepGCodeText)
@@ -191,9 +138,8 @@ void MainWindow::RefreshUI(bool clearOnly, bool keepGCodeText)
     this->FillOutput(clearOnly);
 }
 
-void MainWindow::RefreshFileMenu(bool clearEnabled, bool saveGCodeEnabled, bool saveVAXCodeEnabled)
+void MainWindow::RefreshFileMenu(bool saveGCodeEnabled, bool saveVAXCodeEnabled)
 {
-    ui->tsmiClear->setEnabled(clearEnabled);
     ui->tsmiSaveGCode->setEnabled(saveGCodeEnabled);
     ui->tsmiSaveVAXCode->setEnabled(saveVAXCodeEnabled);
 }
@@ -229,7 +175,7 @@ void MainWindow::Clear(bool keepGCodeText)
     vaxCommands.clear();
     Executor::Instance().Reset();
 
-    this->RefreshFileMenu(false, false, false);
+    this->RefreshFileMenu(false, false);
     this->RefreshRunMenu(false, false, false, false, false);
     this->RefreshUI(true, keepGCodeText);
 
@@ -264,7 +210,7 @@ void MainWindow::Open()
                 ui->txtEditHaskell->clear();
                 foreach (QString line, buffer)
                     ui->txtEditHaskell->append(line);
-                ui->btnExecute->setEnabled(true);
+                ui->btnTranslate->setEnabled(true);
             }
         }
     }
@@ -272,6 +218,111 @@ void MainWindow::Open()
     {
        ui->txtOutput->append("Error: Opening Haskell file");
     }
+}
+
+void MainWindow::Translate()
+{
+    try
+    {
+        QFile file("parser/input.txt");
+        file.open(QIODevice::WriteOnly);
+
+        QTextStream outStream(&file);
+        if(ui->txtEditHaskell->toPlainText().length() > 0)
+            outStream << ui->txtEditHaskell->toPlainText();
+        outStream.flush();
+
+        file.close();
+    }
+    catch(std::exception e)
+    {
+        ui->txtOutput->append("Error: Saving input.txt file");
+    }
+
+    try
+    {
+        QFile file("gcode.txt");
+        if(file.open(QIODevice::WriteOnly))
+            file.resize(0);
+        file.close();
+    }
+    catch(std::exception e)
+    {
+        ui->txtOutput->append("Error: Clearing gcode.txt file");
+    }
+
+    if(!system("parser/proba < parser/input.txt"))
+    {
+        QList<QString> buffer;
+        try
+        {
+            QFile file("gcode.txt");
+            if(file.open(QIODevice::ReadOnly))
+            {
+                QTextStream in(&file);
+                while(!in.atEnd())
+                    buffer.push_back(in.readLine());
+
+                file.close();
+
+                for (int i = 0; i <= buffer.length() - 1 && buffer[0] == ""; i++)
+                    buffer.removeAt(0);
+
+                for (int i = buffer.length() - 1; i >= 0 && buffer[i] == ""; i--)
+                    buffer.removeAt(i);
+
+                ui->txtEditorGCode->clear();
+                foreach (QString line, buffer)
+                    ui->txtEditorGCode->append(line);
+            }
+        }
+        catch(std::exception e)
+        {
+           ui->txtOutput->append("Error: Opening gcode.txt file");
+        }
+
+        if(Parser::Instance().Parse(buffer, &gCommands))
+        {
+            QString errorMessage;
+            if(Executor::Instance().Init(gCommands, errorMessage))
+            {
+                this->RefreshUI();
+                this->RefreshFileMenu(true, false);
+                this->RefreshRunMenu(false, true, false, true, false);
+                this->FillVAXCodeEditor();
+                _gCodeValid = true;
+            }
+            else
+            {
+                ui->txtEditorGCode->clear();
+                ui->txtOutput->clear();
+                ui->txtOutput->append(errorMessage);
+            }
+        }
+    }
+}
+
+void MainWindow::Save(QTextEdit *editor, QString fileName)
+{
+    try
+    {
+         QString saveFilename = QFileDialog::getSaveFileName(this, tr("Save file"), fileName);
+
+         QFile file(saveFilename);
+         file.open(QIODevice::WriteOnly);
+
+         QTextStream outStream(&file);
+
+         if(editor->toPlainText().length() > 0)
+             outStream << editor->toPlainText();
+
+         outStream.flush();
+         file.close();
+     }
+     catch(std::exception e)
+     {
+        ui->txtOutput->append("Error: Saving " + fileName + " file");
+     }
 }
 
 void MainWindow::Evaluate()
@@ -313,7 +364,8 @@ void MainWindow::Evaluate()
         }
     }
 
-    this->RefreshFileMenu(ui->txtEditorGCode->toPlainText().length() > 0, ui->txtEditorGCode->toPlainText().length() > 0, false);
+    this->RefreshFileMenu(ui->txtEditorGCode->toPlainText().length() > 0,
+                          ui->txtEditorVAXCode->toPlainText().count() > 0);
 }
 
 void MainWindow::Next()
@@ -364,6 +416,11 @@ void MainWindow::on_tsmiOpen_triggered()
     this->Open();
 }
 
+void MainWindow::on_tsmiTranslate_triggered()
+{
+    this->Translate();
+}
+
 void MainWindow::on_tsmiClear_triggered()
 {
     this->Clear();
@@ -371,46 +428,12 @@ void MainWindow::on_tsmiClear_triggered()
 
 void MainWindow::on_tsmiSaveGCode_triggered()
 {
-    try{
-         QString saveFilename = QFileDialog::getSaveFileName(this, tr("Save file"), "GCode.txt");
-
-         QFile file(saveFilename);
-         file.open(QIODevice::WriteOnly);
-
-         QTextStream outStream(&file);
-
-         if(ui->txtEditorGCode->toPlainText().length() > 0)
-             outStream << ui->txtEditorGCode->toPlainText();
-
-         outStream.flush();
-         file.close();
-     }
-     catch(std::exception e)
-     {
-        ui->txtOutput->append("Error: Saving GCode file");
-     }
+    this->Save(ui->txtEditorGCode, "GCode.txt");
 }
 
 void MainWindow::on_tsmiSaveVAXCode_triggered()
 {
-    try{
-         QString saveFilename = QFileDialog::getSaveFileName(this, tr("Save file"), "VAXCode.txt");
-
-         QFile file(saveFilename);
-         file.open(QIODevice::WriteOnly);
-
-         QTextStream outStream(&file);
-
-         if(ui->txtEditorVAXCode->toPlainText().length() > 0)
-             outStream << ui->txtEditorVAXCode->toPlainText();
-
-         outStream.flush();
-         file.close();
-     }
-     catch(std::exception e)
-    {
-        ui->txtOutput->append("Error: Saving VAXCode file");
-    }
+    this->Save(ui->txtEditorVAXCode, "VAXCode.txt");
 }
 
 void MainWindow::on_tsmiClose_triggered()
@@ -448,6 +471,25 @@ void MainWindow::on_btnOpen_clicked()
     this->Open();
 }
 
+void MainWindow::on_btnClear_clicked()
+{
+
+}
+
+void MainWindow::on_btnTranslate_clicked()
+{
+    this->Translate();
+}
+
+void MainWindow::on_txtEditHaskell_textChanged()
+{
+    bool enabled = ui->txtEditHaskell->toPlainText().count() > 0;
+    ui->tsmiTranslate->setEnabled(enabled);
+    ui->btnTranslate->setEnabled(enabled);
+    ui->tsmiClear->setEnabled(enabled);
+    ui->btnClear->setEnabled(enabled);
+}
+
 void MainWindow::on_btnRestart_clicked()
 {
     this->Evaluate();
@@ -478,13 +520,8 @@ void MainWindow::on_txtEditorGCode_textChanged()
     bool notEmpty = ui->txtEditorGCode->toPlainText().length() > 0;
     _gCodeValid = false;
 
-    this->RefreshFileMenu(notEmpty, notEmpty, ui->txtEditorVAXCode->toPlainText().length() > 0);
+    this->RefreshFileMenu(notEmpty, ui->txtEditorVAXCode->toPlainText().length() > 0);
     this->RefreshRunMenu(notEmpty, false, false, false, false);
-}
-
-void MainWindow::on_btnTranslate_clicked()
-{
-    //obrisi
 }
 
 void MainWindow::on_txtEditorVAXCode_textChanged()
@@ -499,90 +536,4 @@ void MainWindow::delay( int millisecondsToWait)
     {
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
     }
-}
-
-void MainWindow::on_btnPlay_clicked()
-{
-
-}
-
-void MainWindow::on_btnExecute_clicked()
-{
-    ui->txtEditHaskell->setEnabled(false);
-    ui->btnExecute->setEnabled(false);
-
-    try{
-         QString saveFilename = "parser/input.txt";
-
-         QFile file(saveFilename);
-         file.open(QIODevice::WriteOnly);
-
-         QTextStream outStream(&file);
-
-         if(ui->txtEditHaskell->toPlainText().length() > 0)
-             outStream << ui->txtEditHaskell->toPlainText();
-
-         outStream.flush();
-         file.close();
-     }
-     catch(std::exception e)
-     {
-        ui->txtOutput->append("Error: Saving GCode file");
-     }
-
-
-    if(!system("parser/proba < parser/input.txt"))
-    {
-        QList<QString> buffer;
-        try
-        {
-                QFile file("gcode.txt");
-                if(file.open(QIODevice::ReadOnly))
-                {
-                    QTextStream in(&file);
-
-                    while(!in.atEnd())
-                        buffer.push_back(in.readLine());
-                    file.close();
-
-                    for (int i = 0; i <= buffer.length() - 1 && buffer[0] == ""; i++)
-                        buffer.removeAt(0);
-
-                    for (int i = buffer.length() - 1; i >= 0 && buffer[i] == ""; i--)
-                        buffer.removeAt(i);
-
-                    ui->txtEditorGCode->clear();
-                    foreach (QString line, buffer)
-                        ui->txtEditorGCode->append(line);
-                }
-        }
-        catch(std::exception e)
-        {
-           ui->txtOutput->append("Error: Opening Haskell file");
-        }
-
-        if(Parser::Instance().Parse(buffer, &gCommands))
-        {
-            QString errorMessage;
-            if(Executor::Instance().Init(gCommands, errorMessage))
-            {
-                this->RefreshUI();
-                this->RefreshFileMenu(true, true, false);
-                this->RefreshRunMenu(false, true, false, true, false);
-                this->FillVAXCodeEditor(true);
-                _gCodeValid = true;
-            }
-            else
-            {
-                ui->txtEditorGCode->clear();
-                ui->txtOutput->clear();
-                ui->txtOutput->append(errorMessage);
-            }
-        }
-    }
-}
-
-void MainWindow::on_textEditHaskell_textChanged()
-{
-        ui->btnExecute->setEnabled(true);
 }

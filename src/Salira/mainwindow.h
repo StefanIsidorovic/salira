@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTextEdit>
 
 namespace Ui {
 class MainWindow;
@@ -62,6 +63,12 @@ private slots:
 
     void on_btnOpen_clicked();
 
+    void on_tsmiTranslate_triggered();
+
+    void on_txtEditHaskell_textChanged();
+
+    void on_btnClear_clicked();
+
 private:
     Ui::MainWindow *ui;
     void FillGCodeEditor();
@@ -71,12 +78,14 @@ private:
     void FillDump(bool clearOnly = false);
     void FillOutput(bool clearOnly = false);
     void RefreshUI(bool clearOnly = false, bool keepGCodeText = false);
-    void RefreshFileMenu(bool clearEnabled, bool saveGCodeEnabled, bool saveVAXCodeEnabled);
+    void RefreshFileMenu(bool saveGCodeEnabled, bool saveVAXCodeEnabled);
     void RefreshRunMenu(bool evaluateEnabled, bool nextEnabled, bool previousEnabled, bool runEnabled, bool stopEnabled);
     void RemoveAllButtons(QLayout *layout);
     void Clear(bool keepGCodeText = false);
 
     void Open();
+    void Save(QTextEdit *editor, QString fileName);
+    void Translate();
     void Evaluate();
     void Next();
     void Previous();

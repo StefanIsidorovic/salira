@@ -58,3 +58,30 @@ int GraphNode::value()
     return this->_value;
 }
 
+QString GraphNode::ToString()
+{
+    QString retValue;
+    switch(this->_type)
+    {
+    case 0:
+        retValue = "HOLE";
+        break;
+    case 1:
+        retValue = "INTEGER\nNODE [" + QString::number(this->_id + 1) + "]\nValue = " + QString::number(this->_value);
+        break;
+    case 2:
+        retValue = "FUNCTION\nNODE [" + QString::number(this->_id + 1) + "]\n" + this->_functionName;
+        break;
+    case 3:
+        retValue = "CONST\nNODE[" + QString::number(this->_id + 1) + "]\nNODE [" + QString::number(this->_idRef1 + 1)
+                + "]\nNODE [" + QString::number(this->_idRef2 + 1);
+        break;
+    case 4:
+        retValue = "APPLICATION\nNODE[" + QString::number(this->_id + 1) + "]\nNODE [" + QString::number(this->_idRef1 + 1)
+                + "]\nNODE [" + QString::number(this->_idRef2 + 1) + "]";
+        break;
+    }
+
+    return retValue;
+}
+
