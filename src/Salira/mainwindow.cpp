@@ -423,7 +423,7 @@ void MainWindow::on_tsmiTranslate_triggered()
 
 void MainWindow::on_tsmiClear_triggered()
 {
-    this->Clear();
+    ui->txtEditHaskell->clear();
 }
 
 void MainWindow::on_tsmiSaveGCode_triggered()
@@ -473,7 +473,7 @@ void MainWindow::on_btnOpen_clicked()
 
 void MainWindow::on_btnClear_clicked()
 {
-
+    ui->txtEditHaskell->clear();
 }
 
 void MainWindow::on_btnTranslate_clicked()
