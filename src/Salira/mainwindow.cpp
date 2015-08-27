@@ -515,6 +515,21 @@ void MainWindow::on_btnStop_clicked()
     this->Stop();
 }
 
+void MainWindow::on_btnPlay_clicked()
+{
+
+}
+
+void MainWindow::on_btnExecute_clicked()
+{
+
+}
+
+void MainWindow::on_textEditHaskell_textChanged()
+{
+
+}
+
 void MainWindow::on_txtEditorGCode_textChanged()
 {
     bool notEmpty = ui->txtEditorGCode->toPlainText().length() > 0;
