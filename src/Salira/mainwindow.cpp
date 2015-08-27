@@ -9,8 +9,6 @@
 #include <unistd.h>
 #include <QTime>
 #include <iostream>
-#include <QTextBlock>
-#include <QTextCursor>
 
 static QString fileName = "parser/ulaz.txt";
 static QList<GCommand> gCommands;
