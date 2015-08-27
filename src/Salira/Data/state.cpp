@@ -1008,7 +1008,7 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
     {
         state._stack.push_back(id1);
 //        state = State(state, command, _maxID, lineNumber);
-        return Unwind(command, state, commands, lineNumber-1);
+        return Unwind(command, state, commands, lineNumber);
     }
 
     if(argType == GraphNodeType::Function)
@@ -1034,7 +1034,7 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
             }
             state._stack.push_back(state._graph[state.stack().last()].idRef2());
 
-            return state.Neg(command, state, lineNumber-1);
+            return state.Neg(command, state, lineNumber);
         }
 
 /*        if(funName == QString("$ADD") || funName == QString("$SUB")
@@ -1094,17 +1094,17 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
                 state._graph[state.stack()[state.stack().length() - arg]] = GraphNode(state._stack.length()-arg, 0,0, GraphNodeType::Integer, value, NULL);
 
                 if(funName == QString("$ADD"))
-                    return state.Add(command, state, lineNumber-1);
+                    return state.Add(command, state, lineNumber);
                 else if(funName == QString("$SUB"))
-                    return state.Sub(command, state, lineNumber-1);
+                    return state.Sub(command, state, lineNumber);
                 else if(funName == QString("$MUL"))
-                    return state.Mul(command, state, lineNumber-1);
+                    return state.Mul(command, state, lineNumber);
                 else if(funName == QString("$DIV"))
-                    return state.Div(command, state, lineNumber-1);
+                    return state.Div(command, state, lineNumber);
                 else if(funName == QString("$MIN"))
-                    return state.Min(command, state, lineNumber-1);
+                    return state.Min(command, state, lineNumber);
                 else if(funName == QString("$MAX"))
-                    return state.Max(command, state, lineNumber-1);
+                    return state.Max(command, state, lineNumber);
             }
         }
 

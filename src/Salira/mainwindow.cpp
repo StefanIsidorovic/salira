@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <QTime>
 #include <iostream>
+#include <QTextBlock>
+#include <QTextCursor>
 
 static QString fileName = "parser/ulaz.txt";
 static QList<GCommand> gCommands;
@@ -45,7 +47,6 @@ void MainWindow::FillGCodeEditor()
         i++;
     }
     ui->txtEditorGCode->setHtml(buffer);
-
     ui->tsmiSaveGCode->setEnabled(true);
     _gCodeValid = true;
 }

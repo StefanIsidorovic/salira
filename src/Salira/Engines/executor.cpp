@@ -68,17 +68,16 @@ bool Executor::Init(QList<GCommand> commands, QString& errorMessage)
         GCommand command = commands[i];
         state = nextState;
 
-        if(command.value() == "END")
-        {
-           state = State(state,command, state.maxID());
-           this->_states.push_back(state);
-           break;
-        }
-
         if(!(this->_states.last().GetNext(command, nextState, commands, i)))
         {
             errorMessage = nextState.errorMessage();;
             return false;
+        }
+
+        if(command.value() == "END")
+        {
+            this->_states.push_back(nextState);
+            break;
         }
 
         if(nextState.command().value() == "JUMP")
@@ -136,15 +135,14 @@ bool Executor::Init(QList<GCommand> commands, QString& errorMessage)
         {
             GraphNodeType nodeType = typeOfGraphNode(nextState.stack().last(), nextState);
 
-                QString funName = nameOfGraphNode(state.stack().last(), nextState);
-                int arg = argOfFunction(funName, commands);
+            QString funName = nameOfGraphNode(state.stack().last(), nextState);
+            int arg = argOfFunction(funName, commands);
 
-                if((funName == "$NEG" || state.stack().length() > arg)
-                        && State::returnTo().length() > 0)
-                {
-                        i = nextState._returnTo.pop();
-                        continue;
-                }
+            if((funName == "$NEG" || state.stack().length() > arg)
+                    && State::returnTo().length() > 0)
+            {
+                i = nextState._returnTo.pop();
+            }
         }
 
         this->_states.push_back(nextState);
@@ -162,12 +160,6 @@ bool Executor::Init(QList<GCommand> commands, QString& errorMessage)
         return false;
     }
 
-/*    if(this->_states[1].command().value() != "BEGIN" || this->_states.last().command().value() != "END")
-    {
-        errorMessage = "Error: First command in GCode must be 'BEGIN'! Last command in GCode must be 'END'!";
-        return false;
-    }
-*/
     this->_currentState = this->_states[0];
     return true;
 }
