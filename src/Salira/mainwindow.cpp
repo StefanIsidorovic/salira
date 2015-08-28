@@ -422,6 +422,7 @@ void MainWindow::on_tsmiTranslate_triggered()
 void MainWindow::on_tsmiClear_triggered()
 {
     ui->txtEditHaskell->clear();
+    this->Clear();
 }
 
 void MainWindow::on_tsmiSaveGCode_triggered()
@@ -484,7 +485,7 @@ void MainWindow::on_txtEditHaskell_textChanged()
     bool enabled = ui->txtEditHaskell->toPlainText().count() > 0;
     ui->tsmiTranslate->setEnabled(enabled);
     ui->btnTranslate->setEnabled(enabled);
-    ui->tsmiClear->setEnabled(enabled);
+    ui->tsmiClear->setEnabled(enabled || ui->txtEditorGCode->toPlainText().count() > 0);
     ui->btnClear->setEnabled(enabled);
 }
 

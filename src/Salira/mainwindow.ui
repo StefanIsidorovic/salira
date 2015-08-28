@@ -846,15 +846,8 @@
     <addaction name="tsmiRun"/>
     <addaction name="tsmiStop"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="tsmiAbout"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuRun"/>
-   <addaction name="menuHelp"/>
   </widget>
   <action name="tsmiOpen">
    <property name="icon">
@@ -975,7 +968,7 @@
      <normaloff>:/images/Images/brush.png</normaloff>:/images/Images/brush.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Clear G Code</string>
+    <string>&amp;Clear</string>
    </property>
   </action>
   <action name="tsmiTranslate">
