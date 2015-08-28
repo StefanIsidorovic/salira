@@ -135,7 +135,7 @@ VAL: INT_NUM {
 	    values.push_back(Expression(new SaliraInt($1)));
 	   }
 | '-' INT_NUM {
-		values.push_back(Expression(new SaliraInt((-1)*$1)));
+		values.push_back(Expression(new SaliraInt((-1)*$2)));
 
 }
 ;
