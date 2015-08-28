@@ -1,5 +1,4 @@
 #include "state.h"
-#include <iostream>
 
 int State::_maxID = 0;
 int State::_cBegin = 0;
@@ -632,9 +631,9 @@ bool State::Div(GCommand command, State& state, int lineNumber)
     foreach(GraphNode node, state.graph())
     {
         if(node.id() == state.stack().last())
-            arg1Type = node.type();
-        if(node.id() == state.stack()[state.stack().length() - 2])
             arg2Type = node.type();
+        if(node.id() == state.stack()[state.stack().length() - 2])
+            arg1Type = node.type();
      }
     if(arg1Type != GraphNodeType::Integer || arg2Type != GraphNodeType::Integer)
     {
@@ -647,9 +646,9 @@ bool State::Div(GCommand command, State& state, int lineNumber)
     foreach(GraphNode node, state.graph())
     {
         if(node.id() == state.stack().last())
-            arg1 = node.value();
-        if(node.id() == state.stack()[state.stack().length() - 2])
             arg2 = node.value();
+        if(node.id() == state.stack()[state.stack().length() - 2])
+            arg1 = node.value();
     }
 
     if(arg2 == 0)
@@ -660,7 +659,7 @@ bool State::Div(GCommand command, State& state, int lineNumber)
 
     state._stack.pop();
     state._stack.pop();
-    state._stack.push_back(state.hp() - 1);
+    state._stack.push_back(state.hp());
 
     state._graph.push_back(GraphNode(state.hp(), GraphNodeType::Integer, arg1 / arg2));
     state._hp++;
@@ -1007,7 +1006,6 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
     if(argType == GraphNodeType::Application)
     {
         state._stack.push_back(id1);
-//        state = State(state, command, _maxID, lineNumber);
         return Unwind(command, state, commands, lineNumber);
     }
 
@@ -1036,50 +1034,6 @@ bool State::Unwind(GCommand command, State& state, QList<GCommand> commands, int
 
             return state.Neg(command, state, lineNumber);
         }
-
-/*        if(funName == QString("$ADD") || funName == QString("$SUB")
-                || funName == QString("$DIV") || funName == QString("$MUL")
-                || funName == QString("$MIN") || funName == QString("$MAX"))
-        {
-            if(state.stack().length() < 3)
-            {
-                state._errorMessage = "Error on line " + QString::number(currentLineNumber())
-                        + ": Invalid argument in command UNWIND, less then 3 stack node.";
-                return false;
-            }
-
-            state._stack.pop();
-            int idArgValue1 = state._graph[state._stack.pop()].idRef2();
-
-            GraphNodeType nodeType = state._graph[state.stack().last()].type();
-
-            if(nodeType != GraphNodeType::Application)
-            {
-                state._errorMessage = "Error on line " + QString::number(currentLineNumber())
-                        + ": ADD,SUB,MUL,DIV, MIN or MAX instruction on non-integer node.";
-                return false;
-            }
-
-            int argValue2 = state._graph[state.stack().last()].value();
-
-            state._stack.push_back(idArgValue1);
-            state._stack.push_back(state.hp());
-            state._graph.push_back(GraphNode(state.hp(), GraphNodeType::Integer, argValue2));
-            state._hp++;
-
-            if(funName == QString("$ADD"))
-                return state.Add(command, state, lineNumber-1);
-            else if(funName == QString("$SUB"))
-                return state.Sub(command, state, lineNumber-1);
-            else if(funName == QString("$MUL"))
-                return state.Mul(command, state, lineNumber-1);
-            else if(funName == QString("$DIV"))
-                return state.Div(command, state, lineNumber-1);
-            else if(funName == QString("$MIN"))
-                return state.Min(command, state, lineNumber-1);
-            else if(funName == QString("$MAX"))
-                return state.Max(command, state, lineNumber-1);
-        }*/
 
         if(funName == QString("$ADD") || funName == QString("$SUB")
                 || funName == QString("$DIV") || funName == QString("$MUL")
@@ -1170,7 +1124,8 @@ bool State::Jump(GCommand command, State& state, QList<GCommand> commands, int l
 
     if(index == -1)
     {
-        state._errorMessage = "Error on line " + QString::number(this->currentLineNumber()) + ": No appropriate label " +
+        state._errorMessage = "Error on line " + QString::number(this->currentLineNumber())
+                + ": No appropriate label " +
                 command.args()[0]->ToString() + " for JUMP instruction.";
         return false;
     }
@@ -1212,7 +1167,8 @@ bool State::JFalse(GCommand command, State& state, QList<GCommand> commands, int
 
         if(index == -1)
         {
-            state._errorMessage = "Error on line " + QString::number(this->currentLineNumber()) + ": No appropriate label " +
+            state._errorMessage = "Error on line " + QString::number(this->currentLineNumber())
+                    + ": No appropriate label " +
                     command.args()[0]->ToString() + " for JFALSE instruction.";
             return false;
         }

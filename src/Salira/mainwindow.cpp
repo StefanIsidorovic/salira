@@ -8,7 +8,6 @@
 #include <Engines/executor.h>
 #include <unistd.h>
 #include <QTime>
-#include <iostream>
 
 static QString fileName = "parser/ulaz.txt";
 static QList<GCommand> gCommands;
