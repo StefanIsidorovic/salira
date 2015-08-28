@@ -1,0 +1,274 @@
+Prevođenje G code instrukcija u VAX kod:
+
+PUSHINT
+incl (%hp)
+incl (%ep)
+moval (%hp),(%ep)
+moval INTEGER,(%hp)
+incl (%hp)
+incl (%ep)
+moval (%hp),(%ep)
+moval x,(%hp)
+PUSHINT
+
+PUSHGLOBAL
+incl (%hp)
+incl (%ep)
+moval (%hp),(%ep)
+moval FUNCTION,(%hp)
+incl (%hp)
+incl (%ep)
+moval (%hp),(%ep)
+moval x,(%hp)
+incl (%hp)
+incl (%ep)
+moval (%hp),(%ep)
+moval y,(%hp)
+PUSHGLOBAL
+
+PUSH
+incl (%ep)
+movl (4*(x+1))(%ep),(%ep)
+PUSH
+
+POP
+moval (4*x)(%ep),(%ep)
+POP
+
+SLIDE
+movl (%ep),r0
+moval (4*(x+1))(%ep),(%ep)
+incl (%ep)
+movl r0,(%ep)
+SLIDE
+
+UPDATE
+movl (%ep),r0
+decl ep
+movl r0,x(%ep)
+UPDATE
+
+ALLOC
+incl (%ep)
+incl (%hp)
+moval (%hp),(%ep)
+moval HOLE,(%hp)
+ALLOC
+
+MKAP
+movl (%ep),r0
+decl (%ep)
+movl (%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+moval APPLY,(%hp)
+incl (%hp)
+movl r0,(%hp)
+incl (%hp)
+movl r1,(%hp)
+MKAP
+
+CONS
+movl (%ep),r0
+decl (%ep)
+movl (%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+moval APPLY,(%hp)
+incl (%hp)
+movl r0,(%hp)
+incl (%hp)
+movl r1,(%hp)
+CONS
+
+ADD
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+addl2 r0,r1
+movl r0,(%hp)
+ADD
+
+SUB
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+subl2 r0,r1
+movl r0,(%hp)
+SUB
+
+MUL
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+mull2 r0,r1
+movl r0,(%hp)
+MUL
+
+DIV
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+divl2 r0,r1
+movl r0,(%hp)
+DIV
+
+NEG
+movl @(%ep),r0
+mull2 r0,#-1
+incl (%hp)
+moval (%hp),(%ep)
+movl r0,(%hp)
+NEG
+
+HEAD
+movl 1(%ep),(%ep)
+HEAD
+
+BEGIN
+.set ep,0
+.set hp,1000
+.set sp,2000
+.set op,3000
+BEGIN
+
+END
+END
+
+GLOBSTART
+x:
+GLOBSTART
+
+PRINT
+incl (%op)
+moval x,(%op)
+PRINT
+
+JUMP
+jmp x
+JUMP
+
+LABEL
+x:
+LABEL
+
+JFALSE
+jlss x
+JFALSE
+
+MIN
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+movl minu(r0,r1),r0
+movl r0,(%hp)
+MIN
+
+MAX
+movl @(%ep),r0
+decl (%ep)
+movl @(%ep),r1
+incl (%hp)
+moval (%hp),(%ep)
+movl maxu(r0,r1),r0
+movl r0,(%hp)
+MAX
+
+EVAL
+cmpl @(%ep),APPLY
+jlss eval_apply
+cmpl @(%ep),FUNCTION
+jlss eval_function
+EVAL
+
+EVAL2
+eval_apply:
+moval 1(%ep),(%sp)
+movl (%ep),r0
+moval #1,(%ep)
+movl r0,(%ep)
+jsb unwind_apply
+ret
+eval_fun:
+cmpl @(2(%ep)),#0
+jlss eval_fun0
+ret
+eval_fun0:
+moval 1(%ep),(%sp)
+movl (%ep),r0
+moval #1,(%ep)
+movl r0,(%ep)
+ret
+EVAL2
+
+RETURN
+moval #1,(%ep)
+movl (%ep),r0
+moval (%sp),(%ep)
+incl (%ep)
+movl r0,(%ep)
+RETURN
+
+UNWIND
+jmp unwind_label
+UNWIND
+
+UNWIND2
+unwind:
+cmpl @(%ep),APPLY
+jlss unwind_apply
+cmpl @(%ep),FUNCTION
+jlss unwind_function
+cmpl @(%ep),CONS
+jlss unwind_cons
+cmpl @(%ep),INTEGER
+jlss unwind_integer
+rsb
+unwind_integer:
+movl (%ep),r0
+moval (%sp),(%ep)
+incl (%ep)
+movl r0,(%ep)
+rsb
+unwind_cons:
+movl (%ep),r0
+moval (%sp),(%ep)
+incl (%ep)
+movl r0,(%ep)
+rsb
+unwind_apply:
+incl (%ep)
+movl 2(%ep),(%ep)
+jsb unwind
+ret
+unwind_function:
+movl @(2(%ep)),r0
+decl r0
+cmpl (%ep),r0
+blss unwind_function_noargs
+incl r0
+iter:
+decl r0
+moval (x+1)(%ep),r1
+movl 2(r1),x(%ep)
+cmpl r0,#0
+jlss iter
+ret
+unwind_function_noargs:
+moval #1,(%ep)
+movl (%ep),r0
+moval (%sp),(%ep)
+incl (%ep)
+movl r0,(%ep)
+ret
+UNWIND2
