@@ -1,5 +1,4 @@
 #include "executor.h"
-#include <iostream>
 
 static Executor *instance = nullptr;
 const int STACK_SIZE = 256;
@@ -29,6 +28,7 @@ int Executor::valueOfGraphNode(int id, State state)
     for(int i = 0; i < state.graph().length(); i++)
         if(state.graph()[i].id() == id)
             return state.graph()[i].value();
+    throw "Unknown node!";
 }
 
 GraphNodeType Executor::typeOfGraphNode(int id, State state)
@@ -36,6 +36,7 @@ GraphNodeType Executor::typeOfGraphNode(int id, State state)
     for(int i = 0; i < state.graph().length(); i++)
         if(state.graph()[i].id() == id)
             return state.graph()[i].type();
+    throw "Unknown node!";
 }
 
 QString Executor::nameOfGraphNode(int id, State state)
@@ -43,6 +44,7 @@ QString Executor::nameOfGraphNode(int id, State state)
     for(int i = 0; i < state.graph().length(); i++)
         if(state.graph()[i].id() == id)
             return state.graph()[i].functionName();
+    throw "Unknown node!";
 }
 
 int Executor::argOfFunction(QString name, QList<GCommand> commands)
@@ -133,8 +135,6 @@ bool Executor::Init(QList<GCommand> commands, QString& errorMessage)
 
         if(nextState.command().value() == "UNWIND")
         {
-            GraphNodeType nodeType = typeOfGraphNode(nextState.stack().last(), nextState);
-
             QString funName = nameOfGraphNode(state.stack().last(), nextState);
             int arg = argOfFunction(funName, commands);
 

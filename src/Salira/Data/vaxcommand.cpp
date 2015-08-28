@@ -113,7 +113,7 @@ bool VAXCommand::GetCommands(GCommand input, QList<VAXCommand>* output)
     if(input.value() == "UNWIND")
         return Unwind(output);
 
-    if(input.value() == "UNWIND2")//treba videti kako radi
+    if(input.value() == "UNWIND2")
         return Unwind2(output);
 
     if(input.value() == "RETURN")
@@ -325,7 +325,6 @@ bool VAXCommand::End(QList<VAXCommand>* output)
 
 bool VAXCommand::Begin(QList<VAXCommand>* output)
 {
-    //mozda dodati name
     output->push_back(VAXCommand(".set", "ep", "0"));
     output->push_back(VAXCommand(".set", "hp", "1000"));
     output->push_back(VAXCommand(".set", "sp", "2000"));
@@ -440,7 +439,7 @@ bool VAXCommand::Unwind2(QList<VAXCommand>* output)
     output->push_back(VAXCommand("movl", "@(2(%ep))", "r0"));
     output->push_back(VAXCommand("decl", "r0"));
     output->push_back(VAXCommand("cmpl", "(%ep)", "r0"));
-    output->push_back(VAXCommand("jlss", "unwind_function_noargs")); //proveriti
+    output->push_back(VAXCommand("jlss", "unwind_function_noargs"));
     output->push_back(VAXCommand("incl", "r0"));
     output->push_back(VAXCommand("iter:"));
     output->push_back(VAXCommand("decl", "r0"));
