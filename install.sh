@@ -17,6 +17,8 @@ then
 	sudo apt-get -qq update
 	echo -e "\033[31m Installing Qt5....\033[0m"
 	sudo apt-get -qq install qt5-default -y
+	echo "\033[1;29m Installing build essentials... \033[0m"
+	sudo apt-get -qq install build-essential -y
 	echo -e "\033[32m Installing flex...\033[0m"
 	sudo apt-get -qq install flex -y
 	echo -e "\033[35m Installing yacc...\033[0m"
@@ -36,13 +38,13 @@ qmake Salira.pro
 
 # Actual building
 echo -e "\033[36m Actual building... \033[0m"
-make > logMake.txt
+make >> logMake.txt 2>&1
 mkdir parser
 
 # Building and inserting parser
 echo -e "\033[1;35m Mergining with parser... \033[0m"
 cd ../src/parser/
-make > logMake.txt
+make >> logMake.txt 2>&1
 cp proba ../../build/parser/proba
 cd ../../build/
 
@@ -50,4 +52,4 @@ cd ../../build/
 ./Salira
 
 
-
+​
