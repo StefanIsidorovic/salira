@@ -17,7 +17,7 @@ then
 	sudo apt-get -qq update
 	echo -e "\033[31m Installing Qt5....\033[0m"
 	sudo apt-get -qq install qt5-default -y
-	echo "\033[1;29m Installing build essentials... \033[0m"
+	echo -e "\033[1;29m Installing build essentials... \033[0m"
 	sudo apt-get -qq install build-essential -y
 	echo -e "\033[32m Installing flex...\033[0m"
 	sudo apt-get -qq install flex -y
