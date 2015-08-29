@@ -7,11 +7,12 @@ echo -e "\033[33m 3. Build Essentials (g++) \033[0m";
 echo -e "\033[36m If you want to proceed with installation press Y, or N for termination? \033[0m";
 
 # Read if user agreed to install libraries.
-read -n 1 prompt
-echo ""
+
+read -n 1 -r
+echo
 
 # If yes install qt, flex and bison
-if (( "$prompt" == "y"  ||  "$prompt" == "Y" ));
+if [[ $REPLY =~ ^[Yy]$ ]]
 then
 	echo -e "\033[1;29m Update repositories... \033[0m"
 	sudo apt-get -qq update
