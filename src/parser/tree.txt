@@ -1,0 +1,13 @@
+Functor$F
+  SaliraToken
+Functor$F
+  Functor$ADD
+    SaliraToken
+    SaliraInt:3
+Functor$F
+  SaliraInt:3
+Functor$F
+Functor$F
+Functor$F
+Functor$F
+  Functor$ADD

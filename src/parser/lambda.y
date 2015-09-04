@@ -66,7 +66,7 @@
 %token <intNum> INT_NUM
 %token <doubleNum> DOUBLE_NUM
 %token <str> ID COMMENT ID_F
-%token LET IN MAX MIN NEG
+%token LET IN MAX MIN NEG HEAD
 %type <e> EXP ARGS ARGEXP ARGS_F VALS VAL
 
 
@@ -75,24 +75,22 @@
 %left "func"
 %left "func2"
 %left "func1"
+%left ':'
 %left '+' '-'
 %left '*'
 %left '/'
 %left '(' ')'
-
+%left '[' ']'
 
 
 %%
-P : PROGRAM {
-}
+P : PROGRAM {}
 ;
-PROGRAM : PROGRAM LINE ';' {
-}
-| LINE ';' {
-}
+PROGRAM : PROGRAM LINE ';' {}
+| LINE ';' {}
 ;
-LINE : ID_F ARGS '=' EXP  {
-
+LINE : ID_F ARGS '=' EXP
+{
 			  Expression f = new Functor(std::string("$")+std::string($1), {$4}, arguments.size());
 			  f->tree(0);
 			  SaliraLog::log("ttt");
@@ -104,74 +102,85 @@ LINE : ID_F ARGS '=' EXP  {
 			  // debug
 			  // std::cout << "Deklaracija " <<$1 << std::endl;
 }
-| ID_F VALS {
+| ID_F VALS
+{
 	  // std::cout << "Udje " <<$1 << std::endl;
-
 	  Expression f = new Functor(std::string("$")+std::string($1), values, values.size());
 	  Functor::gCodeEnd(f);
-
       }
-;ARGS : ARGS ARGEXP {}
+;
+ARGS : ARGS ARGEXP {}
 | ARGEXP {}
 ;
-ARGEXP : ID {
+ARGEXP : ID
+{
 	    if(variables.find($1) == variables.end())
 	    {
 	      variables[$1] = counter;
 	      counter++;
 	    }
 	    arguments.push_back(new Token(variables[$1]));
-  }
-;
-VALS : VALS VAL {
-      }
-| VAL {
 }
 ;
-VAL: INT_NUM {
+VALS : VALS VAL {}
+| VAL {}
+;
+VAL: INT_NUM
+{
 	    values.push_back(Expression(new SaliraInt($1)));
-	   }
-| DOUBLE_NUM {
+}
+| DOUBLE_NUM
+{
 	    values.push_back(Expression(new SaliraInt($1)));
-	   }
-| '-' INT_NUM {
+}
+| '-' INT_NUM
+{
 		values.push_back(Expression(new SaliraInt((-1)*$2)));
-
 }
+| LIST {}
 ;
-EXP : EXP '+' EXP {
+EXP : EXP '+' EXP
+{
 		  $$ = new Functor("$ADD",{$1,$3});
 		  // std::cout << "+" << std::endl;
-	}
-| EXP '-' EXP {
+}
+| EXP '-' EXP
+{
 	      $$ = new Functor("$SUB",{$1,$3});
 	      // std::cout << "-" << std::endl;
-	}
-| EXP '*' EXP {
+}
+| EXP '*' EXP
+{
 		$$ = new Functor("$MUL",{$1,$3});
 		// std::cout << "*" << std::endl;
-	}
-| EXP '/' EXP {
+}
+| EXP '/' EXP
+{
 		$$ = new Functor("$DIV",{$1,$3});
 		// std::cout << "//" << std::endl;
 }
-| INT_NUM {
+| INT_NUM
+{
 	  $$ = new SaliraInt($1);
 	  // std::cout << $1 << std::endl;
 }
-| DOUBLE_NUM {
+| DOUBLE_NUM
+{
 	    $$ = new SaliraInt($1);
 }
-| ID_F ARGS_F  %prec "func"{
+| ID_F ARGS_F  %prec "func"
+{
 			    $$ = new Functor(std::string("$")+std::string($1),args_f);
 			    args_f.clear();
 			    // std::cout << $1 << std::endl;
 }
-| NEG '(' EXP ')' {
+| NEG '(' EXP ')'
+{
 			    $$ = new Functor("$NEG",{$3});
 			    // std::cout << " NEG " << std::endl;
 }
-| ID {
+| ID
+{
       if(variables.find($1) == variables.end())
       {
 	  throw SaliraException("Variable not exists in declaration of function arguments.");
@@ -180,18 +189,32 @@ EXP : EXP '+' EXP {
       $$ = new Token(variables[$1]);
       // std::cout << $1 << std::endl;
 }
-| '(' EXP ')'   {
+| '(' EXP ')'
+{
 		  $$ = $2;
-		  }
+}
+| LIST {}
+| INT_NUM ':' EXP {}
+| HEAD '(' EXP ')' {}
 ;
-ARGS_F : ARGS_F EXP %prec "func1" {
+ARGS_F : ARGS_F EXP %prec "func1"
+{
 				  args_f.push_back($2);
 				  // std::cout  <<" argumenti funkcije" << std::endl;
 }
-| EXP %prec "func2"{
+| EXP %prec "func2"
+{
 		    args_f.push_back($1);
 		    // std::cout << "argument funkcije" << std::endl;
 }
+;
+LIST : '[' LIST_ITEMS ']' {}
+;
+LIST_ITEMS : LIST_ITEMS ',' INT_NUM
+{}
+| INT_NUM
+{}
+| {}
 ;
 %%
 
