@@ -1,4 +1,0 @@
-Functor$F
-  Functor$ADD
-    SaliraToken
-    SaliraInt:3
