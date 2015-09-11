@@ -20,3 +20,8 @@ da bi se program startovao, ili dvoklikom na Salira datoteku u direktorijumu bui
 Za brisanje kompajliranog Salira projekta pokrenuti clean.sh skriptu pomoću komande 
 
 ./clean.sh
+
+
+NAPOMENA: Skripta je predviđena za debian-based Linux distribucije, pošto se oslanja na dpkg i apt-get alate 
+za proveru i instalaciju potrebnih biblioteka i paketa.
+Listu takvih distribucija možete pogledati na https://www.debian.org/misc/children-distros
