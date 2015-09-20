@@ -48,24 +48,6 @@ void MainWindow::FillGCodeEditor()
     _gCodeValid = true;
 }
 
-void MainWindow::FillVAXCodeEditor(bool clearOnly)
-{
-    ui -> txtEditorVAXCode->clear();
-
-    if(clearOnly)
-        return;
-
-    if(!Translator::Instance().Translate(gCommands, &vaxCommands) || vaxCommands.size() == 0)
-    {
-        ui->tsmiSaveVAXCode->setEnabled(false);
-        return;
-    }
-
-    foreach (VAXCommand command, vaxCommands)
-        ui->txtEditorVAXCode->append(command.ToString());
-    ui->tsmiSaveVAXCode->setEnabled(true);
-}
-
 void MainWindow::FillStack(bool clearOnly)
 {
     this->RemoveAllButtons(ui->frameStack->layout());
@@ -136,10 +118,9 @@ void MainWindow::RefreshUI(bool clearOnly, bool keepGCodeText)
     this->FillOutput(clearOnly);
 }
 
-void MainWindow::RefreshFileMenu(bool saveGCodeEnabled, bool saveVAXCodeEnabled)
+void MainWindow::RefreshFileMenu(bool saveGCodeEnabled)
 {
     ui->tsmiSaveGCode->setEnabled(saveGCodeEnabled);
-    ui->tsmiSaveVAXCode->setEnabled(saveVAXCodeEnabled);
 }
 
 void MainWindow::RefreshRunMenu(bool evaluateEnabled, bool nextEnabled, bool previousEnabled, bool runEnabled, bool stopEnabled)
@@ -173,11 +154,10 @@ void MainWindow::Clear(bool keepGCodeText)
     vaxCommands.clear();
     Executor::Instance().Reset();
 
-    this->RefreshFileMenu(false, false);
+    this->RefreshFileMenu(false);
     this->RefreshRunMenu(false, false, false, false, false);
     this->RefreshUI(true, keepGCodeText);
 
-    ui->txtEditorVAXCode->clear();
     _gCodeValid = false;
 }
 
@@ -285,9 +265,8 @@ void MainWindow::Translate()
             if(Executor::Instance().Init(gCommands, errorMessage))
             {
                 this->RefreshUI();
-                this->RefreshFileMenu(true, false);
+                this->RefreshFileMenu(true);
                 this->RefreshRunMenu(false, true, false, true, false);
-                this->FillVAXCodeEditor();
                 _gCodeValid = true;
             }
             else
@@ -352,7 +331,6 @@ void MainWindow::Evaluate()
         {
             this->RefreshUI();
             this->RefreshRunMenu(false, true, false, true, false);
-            this->FillVAXCodeEditor();
             _gCodeValid = true;
         }
         else
@@ -362,8 +340,7 @@ void MainWindow::Evaluate()
         }
     }
 
-    this->RefreshFileMenu(ui->txtEditorGCode->toPlainText().length() > 0,
-                          ui->txtEditorVAXCode->toPlainText().count() > 0);
+    this->RefreshFileMenu(ui->txtEditorGCode->toPlainText().length() > 0);
 }
 
 void MainWindow::Next()
@@ -432,7 +409,11 @@ void MainWindow::on_tsmiSaveGCode_triggered()
 
 void MainWindow::on_tsmiSaveVAXCode_triggered()
 {
-    this->Save(ui->txtEditorVAXCode, "VAXCode.txt");
+}
+
+void MainWindow::on_tsmiSaveHaskellCode_triggered()
+{
+    this->Save(ui->txtEditHaskell, "HaskellCode.txt");
 }
 
 void MainWindow::on_tsmiClose_triggered()
@@ -487,6 +468,7 @@ void MainWindow::on_txtEditHaskell_textChanged()
     ui->btnTranslate->setEnabled(enabled);
     ui->tsmiClear->setEnabled(enabled || ui->txtEditorGCode->toPlainText().count() > 0);
     ui->btnClear->setEnabled(enabled);
+    ui->tsmiSaveHaskellCode->setEnabled(enabled);
 }
 
 void MainWindow::on_btnRestart_clicked()
@@ -534,13 +516,12 @@ void MainWindow::on_txtEditorGCode_textChanged()
     bool notEmpty = ui->txtEditorGCode->toPlainText().length() > 0;
     _gCodeValid = false;
 
-    this->RefreshFileMenu(notEmpty, ui->txtEditorVAXCode->toPlainText().length() > 0);
+    this->RefreshFileMenu(notEmpty);
     this->RefreshRunMenu(notEmpty, false, false, false, false);
 }
 
 void MainWindow::on_txtEditorVAXCode_textChanged()
 {
-    ui->tsmiSaveVAXCode->setEnabled(ui->txtEditorVAXCode->toPlainText().length() > 0);
 }
 
 void MainWindow::delay( int millisecondsToWait)
