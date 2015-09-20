@@ -69,6 +69,8 @@ private slots:
 
     void on_btnClear_clicked();
 
+    void on_tsmiSaveHaskellCode_triggered();
+
 private:
     Ui::MainWindow *ui;
     void FillGCodeEditor();
@@ -78,7 +80,7 @@ private:
     void FillDump(bool clearOnly = false);
     void FillOutput(bool clearOnly = false);
     void RefreshUI(bool clearOnly = false, bool keepGCodeText = false);
-    void RefreshFileMenu(bool saveGCodeEnabled, bool saveVAXCodeEnabled);
+    void RefreshFileMenu(bool saveGCodeEnabled);
     void RefreshRunMenu(bool evaluateEnabled, bool nextEnabled, bool previousEnabled, bool runEnabled, bool stopEnabled);
     void RemoveAllButtons(QLayout *layout);
     void Clear(bool keepGCodeText = false);

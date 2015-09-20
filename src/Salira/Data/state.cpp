@@ -1,4 +1,5 @@
 #include "state.h"
+#include <iostream>
 
 int State::_maxID = 0;
 int State::_cBegin = 0;
@@ -653,10 +654,11 @@ bool State::Div(GCommand command, State& state, int lineNumber)
 
     if(arg2 == 0)
     {
-        state._errorMessage = "Error on line " + QString::number(currentLineNumber()) + ": DIV instruction with zero second argument";
+        state._errorMessage = "Error on line " +
+                QString::number(currentLineNumber()) + ": DIV instruction with zero second argument";
         return false;
     }
-
+    std::cout << arg1 << " " << arg2 << std::endl;
     state._stack.pop();
     state._stack.pop();
     state._stack.push_back(state.hp());
